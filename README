@@ -1,0 +1,15 @@
+*Bare Metal Programming for STM32 Blinking of LED*
+
+*Description:
+ In this project I am using STM32F103CxT6 (x=8/6) board for programming in a bare metal approach without using any IDE.
+ It comprises of 
+   1. Writing linker_script.ld for linking the object files and placing the code and data at appropriate places in memory(flash and RAM).
+   2. Writing startup_code.c which will be the first code executed by the CPU at start of the Flash memory(0x08000000).
+   3. Writing main() function which will be called from the startup code.
+   4. Writing MakeFile which will cross compile the code with arm gcc toolchain.
+
+*Build 
+    make
+
+*Flashing code using OpenOCD 
+    openocd -f interface/stlink.cfg -f target/stm32f1x.cfg -c "program final.bin verify reset exit 0x08000000"
