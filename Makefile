@@ -25,3 +25,6 @@ final.bin: final.elf
 
 clean:
 	rm -f *.elf *.bin
+
+flash:
+	openocd -f interface/stlink.cfg -f target/stm32f1x.cfg -c "program final.bin verify reset exit 0x08000000"
