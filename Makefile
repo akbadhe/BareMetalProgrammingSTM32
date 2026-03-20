@@ -2,12 +2,15 @@
 CC = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
 
+# Add the hal directory to your include path so #include "hal_gpio.h" works
+INC_DIRS = -I. -Ihal
+
 # Compiler Flags
 # -mcpu=cortex-m3: Target your specific ARM core
 # -mthumb: STM32 only supports Thumb-2 instructions
 # -Os: Optimize for SIZE (Crucial for 32KB Flash)
 # -Wall: Show all warnings
-CFLAGS = -mcpu=cortex-m3 -mthumb -Os -Wall -g
+CFLAGS = -mcpu=cortex-m3 -mthumb -Os -Wall -g $(INC_DIRS)
 
 # Linker Flags
 # -T: Point to your 32KB/10KB linker script
@@ -15,10 +18,13 @@ CFLAGS = -mcpu=cortex-m3 -mthumb -Os -Wall -g
 # --gc-sections: Remove unused code (saves space)
 LDFLAGS = -T linker_script.ld -nostdlib -Wl,--gc-sections
 
+# Alternatively, use wildcards if you add more files later:
+SRCS = $(wildcard *.c) $(wildcard hal/*.c)
+
 all: final.bin
 
 final.elf: startup.c main.c
-	$(CC) $(CFLAGS) $(LDFLAGS) startup.c main.c -o final.elf
+	$(CC) $(CFLAGS) $(LDFLAGS) $(SRCS) -o final.elf
 
 final.bin: final.elf
 	$(OBJCOPY) -O binary final.elf final.bin

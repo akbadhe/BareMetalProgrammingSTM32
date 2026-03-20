@@ -1,18 +1,22 @@
 #include <stdint.h>
+#include "stm32f103_gpio.h"
 
 /* Register Addresses for STM32F103C6 */
 /* Reset and Clock Control (RCC) */
 #define RCC_BASE     0x40021000
 #define RCC_APB2ENR  (*(volatile uint32_t *)(RCC_BASE + 0x18/*offset*/))
 
-/* GPIO PORTC */
-#define GPIOC_BASE 0x40011000
-#define GPIOC_CRH  (*(volatile uint32_t *)(GPIOC_BASE + 0x04/*offset*/))
-#define GPIOC_ODR  (*(volatile uint32_t *)(GPIOC_BASE + 0x0C/*offset*/))
-
 /*Bit definitions*/
 #define RCC_IOPCEN  (1 << 4)    // IO Port C clock enable
-#define PC13        (1 << 13)
+
+/*Clock Registers definition*/
+#define RCC_CFGR (*(volatile uint32_t *)(RCC_BASE + 0x04/*offset*/))
+#define RCC_CR   (*(volatile uint32_t *)(RCC_BASE + 0x00/*offset*/))
+
+//PLL selection
+#define PLLMUL   (0x07 << 18)    //PLL input*9
+#define SW       (1<<1)          //Select PLL as SYSCLK
+#define PLLON    (1<<24)
 
 /**
  * Simple delay loop
@@ -26,22 +30,33 @@ void delay(volatile uint32_t count) {
 
 int main(void){
 
-    /* 1. Enable the clock for GPIOC peripheral */
+    /*Configure the clock source selection*/
+    RCC_CFGR |= (PLLMUL | SW );
+
+    /*Enable PLL*/
+    RCC_CR |= PLLON;
+
+    /* Enable the clock for GPIOC peripheral */
     RCC_APB2ENR |= RCC_IOPCEN;
 
-    /* 2. Configure PC13 as Output Push-Pull (2MHz)
-     * Each pin in CRH takes 4 bits. PC13 is bits [23:20]
-     * Clear bits 20-23 and set them to 0x2 (Output mode, max speed 2MHz)
-     */
-    GPIOC_CRH &= ~(0xF << 20); // Clear configuration for Pin 13
-    GPIOC_CRH |=  (0x2 << 20); // Set Pin 13 as General purpose output push-pull
+    //Select the mode and configurations using GPIO HAL
+    GPIO_Config_t myConfig;
+    myConfig.pinNumber = 13;
+    myConfig.mode      = GPIO_MODE_OUTPUT_10MHz;
+    myConfig.config    = GPIO_CNF_OUT_PUSH_PULL;
+
+    //Initialize the GPIOC port with above config and mode
+    HAL_GPIO_Init(GPIOC, &myConfig);
 
     while (1) {
-        /* 3. Toggle the LED */
-        GPIOC_ODR ^= PC13;
 
-        /* 4. Wait */
-        delay(600000);
+        //Turn LED ON
+        HAL_GPIO_Write(GPIOC, 13, 1);
+        delay(1000000);
+
+        //Turn LED OFF
+        HAL_GPIO_Write(GPIOC, 13, 0);
+        delay(200000);
     }
 
     return 0;

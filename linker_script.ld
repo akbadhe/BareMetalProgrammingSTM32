@@ -1,11 +1,11 @@
 /* 1. Define the entry point for the debugger */
 ENTRY(Reset_Handler)
 
-/* 2. Physical Memory Definition (stm32f103c6t6A) */
+/* 2. Physical Memory Definition (stm32f103c8t6A) */
 MEMORY
 {
-    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 32K
-    RAM  (rwx) : ORIGIN = 0x20000000, LENGTH = 10K
+    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 64K
+    RAM  (rwx) : ORIGIN = 0x20000000, LENGTH = 20K
 }
 
 /* 3. Calculate top of RAM for the stack. Stack will grow downwards*/
