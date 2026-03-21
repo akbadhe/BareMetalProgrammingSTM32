@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "common.h"
 
 //GPIO registers structure
 typedef struct{
