@@ -29,7 +29,7 @@ typedef struct{
 #define GPIOF         ((GPIO_Registers_t *)GPIOF_BASE)
 #define GPIOG         ((GPIO_Registers_t *)GPIOG_BASE)
 
-//GPIO Configuration structure
+//GPIO Configuration structure (TODO:use bit fields to optimize memory)
 typedef struct{
     uint8_t pinNumber;
     uint8_t mode;

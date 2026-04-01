@@ -54,8 +54,12 @@ void HAL_RCC_Init(RCC_Config_t *cfg ){
                     multiplier = PLLx2;
         }
 
-        // 1. Configuration: Select PLL as system clock and select PLL multiplier
-        RCC->CFGR |= ((PLL_SYSCLK << BIT_SHIFT_SW) | (multiplier << BIT_SHIFT_PLLMUL));
+        // 1. Configuration:
+        RCC->CFGR |= ((PLL_SYSCLK << BIT_SHIFT_SW)            |     //Select PLL as system clock
+                      (multiplier << BIT_SHIFT_PLLMUL)        |     //Select PLL multiplier
+                      (cfg->AHB_Prescaler  << BIT_SHIFT_HPRE) |     //Select AHB prescaler
+                      (cfg->APB1_Prescaler << BIT_SHIFT_PPRE1)      //Select APB1 prescaler
+                     );
 
         // 2. Enable: enable PLL after configuration only
         RCC->CR   |= (1 << BIT_SHIFT_PLLON);
@@ -68,4 +72,9 @@ void HAL_RCC_APB2_PeripheralClockEnable(uint16_t peripheral){
 
     //Enable the peripheral
     RCC->APB2ENR |= (1 << peripheral);
+}
+
+void HAL_RCC_APB1_PeripheralClockEnable(uint16_t peripheral){
+    //Enable the TIM2 peripheral
+    RCC->APB1ENR |= (1 << peripheral);
 }
